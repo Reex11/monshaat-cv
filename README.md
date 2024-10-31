@@ -55,12 +55,16 @@ For WSL users:
 
 ## Requirements
 
-- Python 3.8 or higher
-
+- Python 3.8
 - Install the requirements:
     ```bash
     pip install -r requirements.txt
     ```
+
+### To run on Nvidia Jetson based devices:
+Refer to the [Ultralytics Guide to run with NVIDIA Jetson](https://docs.ultralytics.com/guides/nvidia-jetson)
+
+
 
 ## Usage
 To run the project:
