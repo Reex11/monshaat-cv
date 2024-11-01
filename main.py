@@ -84,12 +84,12 @@ def main(device, model, camera, height, width, test):
         yolo = YOLO(model)
 
     # Create the object counter
-    counter = solutions.ObjectCounter(
-        model=model,
-        show=False,
-        region=region,
-        classes=[0]
-    )
+    # counter = solutions.ObjectCounter(
+    #     model=model,
+    #     show=False,
+    #     region=region,
+    #     classes=[0]
+    # )
 
     # Create the heatmap object
     heatmap = create_heatmap(model)
@@ -128,14 +128,13 @@ def main(device, model, camera, height, width, test):
 
             im0 = cv2.resize(im0, (width, height))
             # track objects in the frame
-            results = yolo.track(im0)
+            results = yolo.track(im0, classes=[0])
             annotated_img = results[0].plot()
 
             # generate heatmap every 10 frames
             if i % 5 == 0:
                 heatmapImg = heatmap.generate_heatmap(im0)
             
-            annotated_img = counter.count(im0)
             # merge the heatmap with the original image
             im1 = cv2.addWeighted(annotated_img, 1, heatmapImg, 0.8, 0)
             
