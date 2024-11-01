@@ -1,9 +1,12 @@
 import cv2
 from ultralytics import solutions, YOLO
+import click
+
 
 # Functions
 def getCamera(id):
-    cap = cv2.VideoCapture(id)
+    print(f"Opening camera {id}...")
+    cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
     return cap
 
@@ -18,9 +21,6 @@ def extract_filename(path):
     # extract the filename without the path and extension
     return path.split('/')[-1].split('.')[0]
 
-
-# Load the YOLO model
-
 # Load the heatmap class
 from heatmapper import Heatmap
 def create_heatmap(model, colormap=cv2.COLORMAP_TURBO, show=False):
@@ -29,53 +29,107 @@ def create_heatmap(model, colormap=cv2.COLORMAP_TURBO, show=False):
     return Heatmap(colormap=colormap, show=show, model=model)
 
 # Settings
-yolo = YOLO('yolo11n')
-model = "yolo11n.pt"
-region = [(400,500),(400,0)]
-camera = 0
+@click.command()
+@click.option('--device', default='cpu', help='Device to run the model: [jetson, cpu, gpu]')
+@click.option('--model', default='yolo11n', help='Model to use: [yolo11n, yolo11m, yolo5s, yolo5m, yolo5l, yolo5x]')
+@click.option('--camera', default='0', help='Camera to use: [rtsp, 0]')
+@click.option('--test', default='0', help='[1: True, 0: False]')
 
-
-# Create the heatmap object
-heatmap = create_heatmap(model)
-
-# Create the object counter
-counter = solutions.ObjectCounter(
-    model=model,
-    show=False,
-    region=region,
-)
-
-
-
-# Get the video
-cap = getCamera(camera)
-
-
-# Process the video
-i = 0
-while cap.isOpened():
+def main(device, model, camera, test):
+    # colored output
     
-    success, im0 = cap.read()
-    if not success:
-        break
+    if test == '1':
+        print(f"Testing camera {camera}...")
+    else:
+        print(f"Settings:")
+        print(f"-- Device: {device}")
+        print(f"-- Model: {model}")
+        print(f"-- Camera: {camera} \n")
 
-    # track objects in the frame
-    results = yolo.track(im0)
-    annotated_img = results[0].plot()
+    region = [(400,500),(400,0)]
 
-    # generate heatmap every 10 frames
-    if i % 5 == 0:
-        heatmapImg = heatmap.generate_heatmap(im0)
+    if camera == 'rtsp':
+        live_camera = "rtsp://admin:ai123123@192.168.0.64/Streaming/Channels/101"
+        pred_camera = "rtsp://admin:ai123123@192.168.0.64/Streaming/Channels/102"
+    else:
+        live_camera = camera
+        pred_camera = camera
+
+    # Load the YOLO model
+    yolo_cpu = YOLO(model)
+    if device == 'cpu':
+        yolo = yolo_cpu
+    elif device == 'gpu':
+        yolo = YOLO(model, device='gpu')
+    elif device == 'jetson':
+        yolo_cpu.export(format="engine")
+        model = f'{model}.engine'
+        yolo = YOLO(model)
+
+    # Create the object counter
+    counter = solutions.ObjectCounter(
+        model=model,
+        show=False,
+        region=region,
+        classes=[0]
+    )
+
+    # Create the heatmap object
+    heatmap = create_heatmap(model)
+
+
+    # Get the video
+    live_cap = getCamera(live_camera)
+    if camera == 'rtsp':
+        cap = getCamera(pred_camera)
+    else:
+        cap = live_cap
+
+
+    if test == '1':
+        if not cap.isOpened():
+            print("Cannot open camera")
+        else:
+            print("Camera opened successfully. Press 'q' to exit")
+            while True:
+                ret, frame = cap.read()
+                if not ret:
+                    print("Can't receive frame (stream end?). Exiting ...")
+                    break
+                # Display the resulting frame
+                cv2.imshow('Camera Test', frame)
+                if cv2.waitKey(1) == ord('q'):
+                    break
     
-    annotated_img = counter.count(im0)
-    # merge the heatmap with the original image
-    im1 = cv2.addWeighted(annotated_img, 1, heatmapImg, 0.8, 0)
-    
-    cv2.imshow("Heatmap", im1)
+    else:
+        # Process the video
+        i = 0
+        while cap.isOpened():
+            
+            success, im0 = cap.read()
+            if not success:
+                break
 
-    if cv2.waitKey(1) == ord('q'):
-        break
-    i += 1
+            # track objects in the frame
+            results = yolo.track(im0)
+            annotated_img = results[0].plot()
 
-cap.release()
-cv2.destroyAllWindows()
+            # generate heatmap every 10 frames
+            if i % 5 == 0:
+                heatmapImg = heatmap.generate_heatmap(im0)
+            
+            annotated_img = counter.count(im0)
+            # merge the heatmap with the original image
+            im1 = cv2.addWeighted(annotated_img, 1, heatmapImg, 0.8, 0)
+            
+            cv2.imshow("Heatmap", im0)
+
+            if cv2.waitKey(1) == ord('q'):
+                break
+            i += 1
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    main()
