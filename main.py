@@ -88,11 +88,11 @@ def main(device, model, camera, height, width, test):
     heatmap = create_heatmap(model)
 
     # Get the video
-    live_cap = getCamera(live_camera)
     if camera == 'rtsp':
+        # live_cap = getCamera(live_camera)
         cap = getCamera(pred_camera, width, height)
     else:
-        cap = live_cap
+        cap = getCamera(live_camera, width, height)
 
 
     if test == '1':
