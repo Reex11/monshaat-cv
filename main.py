@@ -129,7 +129,7 @@ def main(device, model, camera, height, width, test):
             # merge the heatmap with the original image
             im1 = cv2.addWeighted(annotated_img, 1, heatmapImg, 0.8, 0)
             
-            cv2.imshow("Heatmap", im0)
+            cv2.imshow("Heatmap", im1)
 
             if cv2.waitKey(1) == ord('q'):
                 break
