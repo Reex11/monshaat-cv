@@ -29,7 +29,7 @@ from heatmapper import Heatmap
 def create_heatmap(model, colormap=cv2.COLORMAP_TURBO, show=False):
     if model is None:
         raise ValueError("Model is required to create heatmap")
-    return Heatmap(colormap=colormap, show=show, model=model)
+    return Heatmap(colormap=colormap, show=show, model=model, classes=[0])
 
 # Settings
 @click.command()
@@ -86,7 +86,6 @@ def main(device, model, camera, height, width, test):
 
     # Create the heatmap object
     heatmap = create_heatmap(model)
-
 
     # Get the video
     live_cap = getCamera(live_camera)
