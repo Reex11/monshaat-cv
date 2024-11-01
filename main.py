@@ -43,6 +43,8 @@ def create_heatmap(model, colormap=cv2.COLORMAP_TURBO, show=False):
 
 def main(device, model, camera, height, width, test):
     # colored output
+
+
     
     if camera == '0':
         camera = int(camera)
@@ -72,7 +74,11 @@ def main(device, model, camera, height, width, test):
     elif device == 'gpu':
         yolo = YOLO(model, device='gpu')
     elif device == 'jetson':
-        yolo_cpu.export(format="engine")
+        # check if {model}.engine exists
+        if not os.path.exists(f'{model}.engine'):
+            print(f"{model}.engine not found.")
+            print(f"Creating {model}.engine...")
+            yolo_cpu.export(format="engine")
         model = f'{model}.engine'
         yolo = YOLO(model)
 
