@@ -36,15 +36,18 @@ def create_heatmap(model, colormap=cv2.COLORMAP_TURBO, show=False):
 @click.option('--device', prompt='Processing Device', default='cpu', help='Device to run the model: [jetson, cpu, gpu]')
 @click.option('--model', prompt='Model', default='yolo11n', help='Model to use: [yolo11n, yolo11m, yolo5s, yolo5m, yolo5l, yolo5x]')
 @click.option('--camera', prompt='Camera', default='0', help='Camera to use: [rtsp, 0]')
-@click.option('--width', prompt='Width', default=640, help='Width of the camera')
-@click.option('--height', prompt='Height', default=480, help='Height of the camera')
-@click.option('--test', default='0', help='[1: True, 0: False]')
+@click.option('--width', type=int, prompt='Width', default=640, help='Width of the camera')
+@click.option('--height', type=int, prompt='Height', default=480, help='Height of the camera')
+@click.option('--test', type=int, default='0', help='[1: True, 0: False]')
 
 
 def main(device, model, camera, height, width, test):
     # colored output
     
-    if test == '1':
+    if camera == '0':
+        camera = int(camera)
+
+    if test == 1:
         print(f"Testing camera {camera}...")
     else:
         print(f"Settings:")
