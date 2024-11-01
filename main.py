@@ -6,7 +6,7 @@ import click
 # Functions
 def getCamera(id, width=False, height=False):
     print(f"Opening camera {id}...")
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(id)
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
     if width and height:
         cap.set(3, width)
