@@ -2,6 +2,7 @@ import cv2
 from ultralytics import solutions, YOLO
 import click
 import os
+import time 
 
 
 # Functions
@@ -120,24 +121,37 @@ def main(device, model, camera, height, width, test):
     else:
         # Process the video
         i = 0
+        timestamp = time.time()
         while cap.isOpened():
             
-            success, im0 = cap.read()
+            success, im_src = cap.read()
             if not success:
                 break
 
-            im0 = cv2.resize(im0, (width, height))
+            im0 = cv2.resize(im_src, (width, height))
             # track objects in the frame
-            results = yolo.track(im0, classes=[0])
-            annotated_img = results[0].plot()
 
-            # generate heatmap every 10 frames
-            if i % 5 == 0:
+            if i % 10 == 0:
                 heatmapImg = heatmap.generate_heatmap(im0)
+
+            if i % 5 == 0:
+                results = yolo.track(im0, classes=[0])
+            # once per second, save the results to a text file
+            if time.time() - timestamp > 1:
+                timestamp = time.time()
+                # write the date time to the text file and objects count
+                with open("output/test.txt", "a") as f:
+                    # print(f"{time.strftime('%Y-%m-%d %H:%M:%S')}: {results[0]}")
+                    f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')}, {len(results[0].boxes.cls.tolist())}\n")
+            # generate heatmap every 10 frames
+            
             
             # merge the heatmap with the original image
-            im1 = cv2.addWeighted(annotated_img, 1, heatmapImg, 0.8, 0)
-            
+            withHeatmap = cv2.addWeighted(im_src, 1, heatmapImg, 0.5, 0)
+            # annotations = cv2.resize(annotations, (width, height))
+            im1 = results[0].plot(img=withHeatmap)
+
+
             cv2.imshow("Heatmap", im1)
 
             if cv2.waitKey(1) == ord('q'):
