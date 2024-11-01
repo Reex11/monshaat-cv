@@ -140,7 +140,7 @@ def main(device, model, camera, height, width, test):
             if time.time() - timestamp > 1:
                 timestamp = time.time()
                 # write the date time to the text file and objects count
-                with open("output/test.txt", "a") as f:
+                with open("output/results.txt", "a") as f:
                     # print(f"{time.strftime('%Y-%m-%d %H:%M:%S')}: {results[0]}")
                     f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')}, {len(results[0].boxes.cls.tolist())}\n")
             # generate heatmap every 10 frames
