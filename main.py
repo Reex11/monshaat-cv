@@ -4,10 +4,13 @@ import click
 
 
 # Functions
-def getCamera(id):
+def getCamera(id, width=False, height=False):
     print(f"Opening camera {id}...")
     cap = cv2.VideoCapture(0)
-    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+    if width and height:
+        cap.set(3, width)
+        cap.set(4, height)
     return cap
 
 def getVideo(path):
@@ -30,12 +33,15 @@ def create_heatmap(model, colormap=cv2.COLORMAP_TURBO, show=False):
 
 # Settings
 @click.command()
-@click.option('--device', default='cpu', help='Device to run the model: [jetson, cpu, gpu]')
-@click.option('--model', default='yolo11n', help='Model to use: [yolo11n, yolo11m, yolo5s, yolo5m, yolo5l, yolo5x]')
-@click.option('--camera', default='0', help='Camera to use: [rtsp, 0]')
+@click.option('--device', prompt='Processing Device', default='cpu', help='Device to run the model: [jetson, cpu, gpu]')
+@click.option('--model', prompt='Model', default='yolo11n', help='Model to use: [yolo11n, yolo11m, yolo5s, yolo5m, yolo5l, yolo5x]')
+@click.option('--camera', prompt='Camera', default='0', help='Camera to use: [rtsp, 0]')
+@click.option('--width', prompt='Width', default=640, help='Width of the camera')
+@click.option('--height', prompt='Height', default=480, help='Height of the camera')
 @click.option('--test', default='0', help='[1: True, 0: False]')
 
-def main(device, model, camera, test):
+
+def main(device, model, camera, height, width, test):
     # colored output
     
     if test == '1':
@@ -45,6 +51,7 @@ def main(device, model, camera, test):
         print(f"-- Device: {device}")
         print(f"-- Model: {model}")
         print(f"-- Camera: {camera} \n")
+        print(f"-- {width}x{height} resolution")
 
     region = [(400,500),(400,0)]
 
@@ -81,7 +88,7 @@ def main(device, model, camera, test):
     # Get the video
     live_cap = getCamera(live_camera)
     if camera == 'rtsp':
-        cap = getCamera(pred_camera)
+        cap = getCamera(pred_camera, width, height)
     else:
         cap = live_cap
 
