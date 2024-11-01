@@ -119,6 +119,7 @@ def main(device, model, camera, height, width, test):
             if not success:
                 break
 
+            im0 = cv2.resize(im0, (width, height))
             # track objects in the frame
             results = yolo.track(im0)
             annotated_img = results[0].plot()
