@@ -60,8 +60,6 @@ def main(device, model, camera, height, width, test):
         print(f"-- Camera: {camera} \n")
         print(f"-- {width}x{height} resolution \n")
 
-    region = [(400,500),(400,0)]
-
     if camera == 'rtsp':
         live_camera = "rtsp://admin:ai123123@192.168.0.64/Streaming/Channels/101"
         pred_camera = "rtsp://admin:ai123123@192.168.0.64/Streaming/Channels/102"
@@ -140,7 +138,9 @@ def main(device, model, camera, height, width, test):
                 # write the date time to the text file and objects count
                 with open("output/results.txt", "a") as f:
                     f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')}, {len(results[0].boxes.cls.tolist())}\n")
-                        
+            
+            # scale up the heatmap
+            heatmapImg = cv2.resize(heatmapImg, (im_src.shape[1], im_src.shape[0]))
             # merge the heatmap with the original image
             withHeatmap = cv2.addWeighted(im_src, 1, heatmapImg, 0.5, 0)
 
