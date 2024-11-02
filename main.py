@@ -58,16 +58,13 @@ def main(device, model, camera, height, width, test):
         print(f"-- Device: {device}")
         print(f"-- Model: {model}")
         print(f"-- Camera: {camera} \n")
-        print(f"-- {width}x{height} resolution")
+        print(f"-- {width}x{height} resolution \n")
 
     region = [(400,500),(400,0)]
 
     if camera == 'rtsp':
         live_camera = "rtsp://admin:ai123123@192.168.0.64/Streaming/Channels/101"
         pred_camera = "rtsp://admin:ai123123@192.168.0.64/Streaming/Channels/102"
-    else:
-        live_camera = camera
-        pred_camera = camera
 
     # Load the YOLO model
     yolo_cpu = YOLO(model)
@@ -100,7 +97,7 @@ def main(device, model, camera, height, width, test):
         # live_cap = getCamera(live_camera)
         cap = getCamera(pred_camera, width, height)
     else:
-        cap = getCamera(live_camera, width, height)
+        cap = getCamera(camera, width, height)
 
 
     if test == '1':
@@ -131,28 +128,26 @@ def main(device, model, camera, height, width, test):
             im0 = cv2.resize(im_src, (width, height))
             # track objects in the frame
 
-            if i % 10 == 0:
+            if i % 7 == 0:
                 heatmapImg = heatmap.generate_heatmap(im0)
 
             if i % 5 == 0:
                 results = yolo.track(im0, classes=[0])
+
             # once per second, save the results to a text file
             if time.time() - timestamp > 1:
                 timestamp = time.time()
                 # write the date time to the text file and objects count
                 with open("output/results.txt", "a") as f:
-                    # print(f"{time.strftime('%Y-%m-%d %H:%M:%S')}: {results[0]}")
                     f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')}, {len(results[0].boxes.cls.tolist())}\n")
-            # generate heatmap every 10 frames
-            
-            
+                        
             # merge the heatmap with the original image
             withHeatmap = cv2.addWeighted(im_src, 1, heatmapImg, 0.5, 0)
-            # annotations = cv2.resize(annotations, (width, height))
+
+            # plot the results on the image
             im1 = results[0].plot(img=withHeatmap)
 
-
-            cv2.imshow("Heatmap", im1)
+            cv2.imshow("Innovation Lab AI Analyzer", im1)
 
             if cv2.waitKey(1) == ord('q'):
                 break
