@@ -86,14 +86,14 @@ def main(device, camera, height, width, test):
         # check if {model}.engine exists
         if not os.path.exists(f'{face_model}.engine'):
             print(f"{face_model}.engine not found.")
-            print(f"Creating {model}.engine...")
+            print(f"Creating {face_model}.engine...")
             face_yolo_cpu.export(format="engine")
         face_model = f'{face_model}.engine'
         face_yolo = YOLO(face_model)
 
         if not os.path.exists(f'{pose_model}.engine'):
             print(f"{pose_model}.engine not found.")
-            print(f"Creating {model}.engine...")
+            print(f"Creating {pose_model}.engine...")
             pose_yolo_cpu.export(format="engine")
         pose_model = f'{pose_model}.engine'
         pose_yolo = YOLO(pose_model)
