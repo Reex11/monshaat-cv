@@ -1,11 +1,6 @@
 # Innovation Center Booth Analyser
 This is a project created by the **Innovation Center** team at **Monshaat** as a demo to the AI capabilities as one of the rising technologies the center focuses on.
 
-## Team
-- Marwan Alqisy
-- Abdulmalik Almushaiqah
-- Abdulaziz Abu Bakr
-
 ## WSL USBIPD Setup
 For WSL users: 
 
@@ -56,6 +51,7 @@ For WSL users:
 ## Requirements
 
 - Python 3.8
+- Ultralytics
 - Install the requirements:
     ```bash
     pip install -r requirements.txt
@@ -64,11 +60,14 @@ For WSL users:
 ### To run on Nvidia Jetson based devices:
 Refer to the [Ultralytics Guide to run with NVIDIA Jetson](https://docs.ultralytics.com/guides/nvidia-jetson)
 
-
-
 ## Usage
-To run the project:
+To run the heatmap analysis:
 ```bash
 python main.py
+```
+
+To run face detection:
+```bash
+python face.py
 ```
 
