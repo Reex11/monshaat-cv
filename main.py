@@ -3,7 +3,7 @@ from ultralytics import solutions, YOLO
 import click
 import os
 import time 
-
+from PIL import Image
 
 # Functions
 def getCamera(id, width=False, height=False):
@@ -35,11 +35,11 @@ def create_heatmap(model, colormap=cv2.COLORMAP_TURBO, show=False):
 
 # Settings
 @click.command()
-@click.option('--device', prompt='Processing Device', default='cpu', help='Device to run the model: [jetson, cpu, gpu]')
-@click.option('--model', prompt='Model', default='yolo11n', help='Model to use: [yolo11n, yolo11m, yolo5s, yolo5m, yolo5l, yolo5x]')
-@click.option('--camera', prompt='Camera', default='0', help='Camera to use: [rtsp, 0]')
-@click.option('--width', type=int, prompt='Width', default=640, help='Width of the camera')
-@click.option('--height', type=int, prompt='Height', default=480, help='Height of the camera')
+@click.option('--device', default='cpu', help='Device to run the model: [jetson, cpu, gpu]')
+@click.option('--model', default='yolo11n', help='Model to use: [yolo11n, yolo11m, yolo5s, yolo5m, yolo5l, yolo5x]')
+@click.option('--camera', default='0', help='Camera to use: [rtsp, 0]')
+@click.option('--width', type=int, default=640, help='Width of the camera')
+@click.option('--height', type=int, default=480, help='Height of the camera')
 @click.option('--test', type=int, default='0', help='[1: True, 0: False]')
 
 
@@ -148,7 +148,7 @@ def main(device, model, camera, height, width, test):
             im1 = results[0].plot(img=withHeatmap)
 
             cv2.imshow("Innovation Lab AI Analyzer", im1)
-
+            
             if cv2.waitKey(1) == ord('q'):
                 break
             i += 1

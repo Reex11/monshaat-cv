@@ -47,10 +47,10 @@ def emotion(emotion):
 
 # Settings
 @click.command()
-@click.option('--device', prompt='Processing Device', default='cpu', help='Device to run the model: [jetson, cpu, gpu]')
-@click.option('--camera', prompt='Camera', default='0', help='Camera to use: [rtsp, 0]')
-@click.option('--width', type=int, prompt='Width', default=640, help='Width of the camera')
-@click.option('--height', type=int, prompt='Height', default=480, help='Height of the camera')
+@click.option('--device', default='cpu', help='Device to run the model: [jetson, cpu, gpu]')
+@click.option('--camera', default='0', help='Camera to use: [rtsp, 0]')
+@click.option('--width', type=int, default=640, help='Width of the camera')
+@click.option('--height', type=int, default=480, help='Height of the camera')
 @click.option('--test', type=int, default='0', help='[1: True, 0: False]')
 
 
