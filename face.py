@@ -57,8 +57,8 @@ def emotion(emotion):
 
 def main(device, camera, height, width, test):
 
-    face_model = 'yolov8n-face-lindevs.pt'
-    pose_model = 'yolo11n-pose.pt'
+    face_model = 'yolov8n-face-lindevs'
+    pose_model = 'yolo11n-pose'
 
     if camera == '0':
         camera = int(camera)
@@ -77,8 +77,8 @@ def main(device, camera, height, width, test):
         camera = "rtsp://admin:ai123123@192.168.0.64/Streaming/Channels/101"
 
     # Load the YOLO model
-    face_yolo_cpu = YOLO(face_model)
-    pose_yolo_cpu = YOLO(pose_model)
+    face_yolo_cpu = YOLO(f'{face_model}.pt')
+    pose_yolo_cpu = YOLO(f'{pose_model}.pt')
     if device == 'cpu':
         face_yolo = face_yolo_cpu
         pose_yolo = pose_yolo_cpu
