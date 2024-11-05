@@ -38,8 +38,8 @@ def create_heatmap(model, colormap=cv2.COLORMAP_TURBO, show=False):
 @click.option('--device', default='cpu', help='Device to run the model: [jetson, cpu, gpu]')
 @click.option('--model', default='yolo11n', help='Model to use: [yolo11n, yolo11m, yolo5s, yolo5m, yolo5l, yolo5x]')
 @click.option('--camera', default='0', help='Camera to use: [rtsp, 0]')
-@click.option('--width', type=int, default=640, help='Width of the camera')
-@click.option('--height', type=int, default=480, help='Height of the camera')
+@click.option('--width', type=int, default=1440, help='Width of the camera')
+@click.option('--height', type=int, default=810, help='Height of the camera')
 @click.option('--test', type=int, default='0', help='[1: True, 0: False]')
 
 
@@ -93,7 +93,7 @@ def main(device, model, camera, height, width, test):
     # Get the video
     if camera == 'rtsp':
         # live_cap = getCamera(live_camera)
-        cap = getCamera(pred_camera, width, height)
+        cap = getCamera(live_camera, width, height)
     else:
         cap = getCamera(camera, width, height)
 
@@ -114,23 +114,25 @@ def main(device, model, camera, height, width, test):
                     break
     
     else:
+
         # Process the video
         i = 0
         timestamp = time.time()
+        visitors_counts = []
         while cap.isOpened():
-            
+
             success, im_src = cap.read()
             if not success:
                 break
 
             im0 = cv2.resize(im_src, (width, height))
-            # track objects in the frame
 
+            # track objects in the frame
             if i % 7 == 0:
                 heatmapImg = heatmap.generate_heatmap(im0)
 
             if i % 5 == 0:
-                results = yolo.track(im0, classes=[0])
+                results = yolo.track(im_src, classes=[0],)
 
             # once per second, save the results to a text file
             if time.time() - timestamp > 1:
@@ -139,13 +141,25 @@ def main(device, model, camera, height, width, test):
                 with open("output/results.txt", "a") as f:
                     f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')}, {len(results[0].boxes.cls.tolist())}\n")
             
+            # add no_of_visitors to the list
+            visitors_counts.append(len(results[0].boxes.cls.tolist()))
+            # if the len of visitors_counts is greater than 60*60 (1 hour)
+            if len(visitors_counts) > 60*60:
+                # remove the first element
+                visitors_counts.pop(0)
+
             # scale up the heatmap
             heatmapImg = cv2.resize(heatmapImg, (im_src.shape[1], im_src.shape[0]))
             # merge the heatmap with the original image
             withHeatmap = cv2.addWeighted(im_src, 1, heatmapImg, 0.5, 0)
 
             # plot the results on the image
-            im1 = results[0].plot(img=withHeatmap)
+            im1 = results[0].plot(img=withHeatmap, line_width=2)
+
+            # show current count of people and avg count of people in the last hour
+            cv2.putText(im1, f"CURRENT VISITORS: {len(results[0].boxes.cls.tolist())}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+            cv2.putText(im1, f"AVG. VISITORS (1HR): {round(sum(visitors_counts)/len(visitors_counts))}", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+
 
             cv2.imshow("Innovation Lab AI Analyzer", im1)
             
