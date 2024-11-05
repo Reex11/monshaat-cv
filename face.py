@@ -155,8 +155,6 @@ def main(device, camera, height, width, test):
             #     region = face['region']
             #     im1 = cv2.putText(im0, f"{gender} {emotion(emotion)}", (region[0], region[1]), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
-            cv2.namedWindow("Innovation Lab AI Pose Detector", cv2.WINDOW_KEEPRATIO)
-
             cv2.imshow("Innovation Lab AI Pose Detector", im1)
 
             if cv2.waitKey(1) == ord('q'):

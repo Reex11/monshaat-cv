@@ -93,7 +93,7 @@ def main(device, model, camera, height, width, test):
     # Get the video
     if camera == 'rtsp':
         # live_cap = getCamera(live_camera)
-        cap = getCamera(live_camera, width, height)
+        cap = getCamera(pred_camera, width, height)
     else:
         cap = getCamera(camera, width, height)
 
@@ -159,8 +159,6 @@ def main(device, model, camera, height, width, test):
             # show current count of people and avg count of people in the last hour
             cv2.putText(im1, f"CURRENT VISITORS: {len(results[0].boxes.cls.tolist())}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
             cv2.putText(im1, f"AVG. VISITORS (1HR): {round(sum(visitors_counts)/len(visitors_counts))}", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-
-            cv2.namedWindow("Innovation Lab AI Analyzer", cv2.WINDOW_KEEPRATIO)
 
             cv2.imshow("Innovation Lab AI Analyzer", im1)
             
