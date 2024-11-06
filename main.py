@@ -157,8 +157,23 @@ def main(device, model, camera, height, width, test):
             im1 = results[0].plot(img=withHeatmap, line_width=2)
 
             # show current count of people and avg count of people in the last hour
-            cv2.putText(im1, f"CURRENT VISITORS: {len(results[0].boxes.cls.tolist())}", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
-            cv2.putText(im1, f"AVG. VISITORS (1HR): {round(sum(visitors_counts)/len(visitors_counts))}", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+            text1 = f"CURRENT VISITORS: {len(results[0].boxes.cls.tolist())}"
+            text2 = f"AVG. VISITORS (1HR): {round(sum(visitors_counts)/len(visitors_counts))}"
+            
+            # Calculate text size
+            (w1, h1), _ = cv2.getTextSize(text1, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+            (w2, h2), _ = cv2.getTextSize(text2, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)
+
+            h1 = h1 *2
+            h2 = h2 *2
+
+            
+            # Add white background for the text
+            cv2.rectangle(im1, (15, 35 - h1), (15 + w1, 35), (255, 255, 255), -1)
+            cv2.rectangle(im1, (15, 85 - h2), (15 + w2, 85), (255, 255, 255), -1)
+            
+            cv2.putText(im1, text1, (15, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
+            cv2.putText(im1, text2, (15, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2)
 
             cv2.imshow("Innovation Lab AI Analyzer", im1)
             
